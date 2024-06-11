@@ -1,7 +1,7 @@
 <template>
   <div class="app-container center">
     <!-- <el-empty description="Admin 权限可见" /> -->
-    
+    <h1>dashbord</h1>
   </div>
 </template>
 

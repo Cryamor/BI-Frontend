@@ -38,7 +38,7 @@ watchEffect(() => {
 })
 //#endregion
 
-showWatermark.value=false
+showWatermark.value = false
 /** 开启或关闭系统水印 */
 watchEffect(() => {
   showWatermark.value ? setWatermark(import.meta.env.VITE_APP_TITLE) : clearWatermark()
