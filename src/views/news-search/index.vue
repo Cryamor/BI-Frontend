@@ -1,10 +1,10 @@
 <template>
   <div>
-    <h1 style="text-align: center; padding-bottom:20px;">新闻生命周期查询</h1>
+    <h1>新闻生命周期查询</h1>
 
-    <el-row :gutter="20">
+    <el-row :gutter="20" justify="space-evenly">
 
-      <el-col :span="16">
+      <el-col :span="14">
         <el-row :gutter="20" justify="space-evenly">
           <el-col :span="6">
             <el-input v-model="idSelected" clearable placeholder="请输入要查询的新闻ID" />
@@ -58,8 +58,6 @@ defineOptions({
 let Chart = null
 
 const idSelected = ref()
-const startDateSelected = ref()
-const endDateSelected = ref()
 const dateSelected = ref()
 const newsSelected = ref()
 const showNewsDetail = ref(false)
@@ -230,6 +228,11 @@ function simulateData() {
 </script>
 
 <style scoped>
+
+h1 {
+  text-align: center; 
+  padding-bottom:20px;
+}
 
 #ct1 {
   height: 500px;

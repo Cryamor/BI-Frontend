@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Interest Change</h1>
+    <h1>用户兴趣变化情况</h1>
   </div>
 </template>
 
@@ -11,3 +11,12 @@ defineOptions({
 })
 
 </script>
+
+<style scoped>
+
+h1 {
+  text-align: center; 
+  padding-bottom:20px;
+}
+
+</style>
