@@ -72,8 +72,9 @@ export const constantRoutes: RouteRecordRaw[] = [
         name: "NewsSearch",
         meta: {
           title: "新闻查询",
-          svgIcon: "dashboard",
-          affix: true
+          svgIcon: "search",
+          affix: true,
+          keepAlive: true
         }
       }
     ]
@@ -122,7 +123,7 @@ export const constantRoutes: RouteRecordRaw[] = [
         component: () => import("@/views/interest/index.vue"),
         name: "Interest",
         meta: {
-          elIcon: "Reading",
+          elIcon: "Star",
           title: "兴趣变化",
           keepAlive: true
         }
@@ -139,7 +140,7 @@ export const constantRoutes: RouteRecordRaw[] = [
         component: () => import("@/views/combine-search/index.vue"),
         name: "CombineSearch",
         meta: {
-          elIcon: "Reading",
+          elIcon: "Connection",
           title: "组合查询",
           keepAlive: true
         }
@@ -156,7 +157,7 @@ export const constantRoutes: RouteRecordRaw[] = [
         component: () => import("@/views/recommend/index.vue"),
         name: "Recommend",
         meta: {
-          elIcon: "Reading",
+          elIcon: "Paperclip",
           title: "新闻推荐",
           keepAlive: true
         }
