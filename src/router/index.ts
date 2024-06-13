@@ -124,7 +124,7 @@ export const constantRoutes: RouteRecordRaw[] = [
         name: "Interest",
         meta: {
           elIcon: "Star",
-          title: "兴趣变化",
+          title: "兴趣偏好",
           keepAlive: true
         }
       }
@@ -206,36 +206,36 @@ export const constantRoutes: RouteRecordRaw[] = [
   //     }
   //   ]
   // },
-  // {
-  //   path: "/table",
-  //   component: Layouts,
-  //   redirect: "/table/element-plus",
-  //   name: "Table",
-  //   meta: {
-  //     title: "表格",
-  //     elIcon: "Grid"
-  //   },
-  //   children: [
-  //     {
-  //       path: "element-plus",
-  //       component: () => import("@/views/table/element-plus/index.vue"),
-  //       name: "ElementPlus",
-  //       meta: {
-  //         title: "Element Plus",
-  //         keepAlive: true
-  //       }
-  //     },
-  //     {
-  //       path: "vxe-table",
-  //       component: () => import("@/views/table/vxe-table/index.vue"),
-  //       name: "VxeTable",
-  //       meta: {
-  //         title: "Vxe Table",
-  //         keepAlive: true
-  //       }
-  //     }
-  //   ]
-  // },
+  {
+    path: "/table",
+    component: Layouts,
+    redirect: "/table/element-plus",
+    name: "Table",
+    meta: {
+      title: "表格",
+      elIcon: "Grid"
+    },
+    children: [
+      {
+        path: "element-plus",
+        component: () => import("@/views/table/element-plus/index.vue"),
+        name: "ElementPlus",
+        meta: {
+          title: "Element Plus",
+          keepAlive: true
+        }
+      },
+      {
+        path: "vxe-table",
+        component: () => import("@/views/table/vxe-table/index.vue"),
+        name: "VxeTable",
+        meta: {
+          title: "Vxe Table",
+          keepAlive: true
+        }
+      }
+    ]
+  },
   // {
   //   path: "/menu",
   //   component: Layouts,

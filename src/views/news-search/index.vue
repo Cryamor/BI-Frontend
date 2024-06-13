@@ -1,43 +1,57 @@
 <template>
   <div>
-    <h1>新闻生命周期查询</h1>
-
-    <el-row :gutter="20" justify="space-evenly">
-
-      <el-col :span="14">
-        <el-row :gutter="20" justify="space-evenly">
-          <el-col :span="6">
-            <el-input v-model="idSelected" clearable placeholder="请输入要查询的新闻ID" />
-          </el-col>
-          <el-col :span="10">
+    <el-row :gutter="20" justify="space-evenly" style="margin-top:20px;">
+      <el-col :span="15">
+        <el-card shadow="never" class="search-wrapper">
+          <el-form 
+            :model="searchForm" 
+            :rules="rules"
+            ref="searchFormRef"
+            label-width="auto" 
+            label-position="left" 
+            :size="formSize"
+            status-icon
+            style="max-width:600px"
+          >
+          <el-form-item label="新闻ID" prop="id">
+            <el-input v-model="searchForm.id" clearable placeholder="请输入要查询的新闻ID" />
+          </el-form-item>
+          <el-form-item label="起止时间" prop="time">
             <el-date-picker
-              v-model="dateSelected"
+              v-model="searchForm.time"
               type="daterange"
               unlink-panels
               range-separator="To"
-              start-placeholder="Start month"
-              end-placeholder="End month"
+              start-placeholder="起始时间"
+              end-placeholder="终止时间"
               :shortcuts="shortcuts"
             />
-          </el-col>
-          <el-col :span="4">
-            <el-button type="primary" @click="search">查询</el-button>
-          </el-col>
-        </el-row>
+          </el-form-item>
+          <el-form-item label="">
+            <el-button @click="submitForm(searchFormRef)" type="primary">查询</el-button>
+            <el-button @click="resetForm(searchFormRef)">重置</el-button>
+          </el-form-item>
+        </el-form>
+        </el-card>
 
-        <el-row>
-          <el-col :span="24">
-            <div id="ct1"></div>
-          </el-col>
-        </el-row>
+        <el-card shadow="never" class="echart-wrapper">
+          <el-row>
+            <el-col :span="24">
+              <div id="ct1"></div>
+            </el-col>
+          </el-row>
+        </el-card>
+
       </el-col>
 
       <el-col :span="8">
-        <div class="content-container" v-if="showNewsDetail">
-          <h2> {{newsSelected.title}} </h2>
-          <div class="news-time">发布时间: {{newsSelected.time}} </div>
-          <div class="news-content">{{newsSelected.content}} </div>
-        </div>
+        <el-card shadow="never" class="content-wrapper">
+          <div class="content-container" v-if="showNewsDetail">
+            <h2> {{newsSelected.title}} </h2>
+            <div class="news-time">发布时间: {{newsSelected.time}} </div>
+            <div class="news-content">{{newsSelected.content}} </div>
+          </div>
+        </el-card>
       </el-col>
     </el-row>
 
@@ -47,23 +61,50 @@
 <script lang="ts" setup>
 
 import * as echarts from "echarts";
-import { ElMessage } from "element-plus";
-import { update } from "lodash-es";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, reactive } from "vue";
+import type { ComponentSize, FormInstance, FormRules } from 'element-plus'
+
 
 defineOptions({
   name: "NewsSearch"
 })
 
 let Chart = null
+let xdata = []
+let ydata = []
 
-const idSelected = ref()
-const dateSelected = ref()
 const newsSelected = ref()
 const showNewsDetail = ref(false)
 
-let xdata = []
-let ydata = []
+interface SearchForm {
+  id: string,
+  time: Date[]
+}
+
+const searchForm = reactive<SearchForm>({
+  id: '',
+  time: [],
+})
+
+const formSize = ref<ComponentSize>('default')
+const searchFormRef = ref<FormInstance>()
+
+const rules = reactive<FormRules<SearchForm>>({
+  id: [
+    {
+      required: true,
+      message: '新闻ID不能为空',
+      trigger: 'blur'
+    }
+  ],
+  time: [
+    {
+      required: true,
+      message: '请选择起止时间',
+      trigger: 'change'
+    }
+  ]
+})
 
 const shortcuts = [
   {
@@ -102,8 +143,25 @@ onMounted(() => {
   getData()
 });
 
+const submitForm = async (formEl: FormInstance | undefined) => {
+  if (!formEl) return
+  await formEl.validate((valid, fields) => {
+    if (valid) {
+      console.log('submit!')
+      search()
+    } else {
+      console.log('error submit!', fields)
+    }
+  })
+}
+
+const resetForm = (formEl: FormInstance | undefined) => {
+  if (!formEl) return
+  formEl.resetFields()
+}
+
 function init() {
-  Chart = echarts.init(document.getElementById("ct1"));
+  Chart = echarts.init(document.getElementById("ct1"))
   let options = {
     title: {
       text: '新闻日流量变化',
@@ -132,10 +190,10 @@ function init() {
         // }
       },
     ],
-  };
+  }
 
   // 渲染图表
-  Chart.setOption(options);
+  Chart.setOption(options)
 
 }
 
@@ -171,11 +229,7 @@ function updateChart() {
 function search() {
   // console.log(formatDateTime(dateSelected.value[0]), formatDateTime(dateSelected.value[1]))
 
-  console.log(idSelected.value)
-  if (idSelected.value === undefined || idSelected.value == '') {
-    ElMessage.error('ID不能为空')
-    return
-  }
+  console.log(searchForm)
 
   clearData()
   simulateData()
@@ -250,12 +304,25 @@ h1 {
 }
 
 .content-container {
-  border: 1px solid #999;
-  border-radius: 0%;
   padding-left: 20px;
   padding-right: 20px;
   padding-bottom: 20px;
   margin-right: 20px;
+}
+
+.search-wrapper {
+  margin-bottom: 20px;
+  :deep(.el-card__body) {
+    padding-bottom: 2px;
+  }
+}
+
+.title-wrapper {
+  margin: 20px 40px;
+}
+
+.content-wrapper {
+  height: 100%;
 }
 
 .news-time {

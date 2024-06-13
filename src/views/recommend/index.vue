@@ -1,7 +1,9 @@
 <template>
-  <div>
-    <h1>新闻推荐</h1>
-    <p style="margin-left:50px;">根据您的历史浏览情况，为你推荐以下新闻:</p>
+  <div style="margin: 0 30px;">
+    <!-- <h1>新闻推荐</h1> -->
+     <el-card shadow="never" class="content-wrapper">
+      <p style="margin-left:50px;">根据您的历史浏览情况，为你推荐以下新闻:</p>
+     </el-card>
   </div>
 </template>
 
@@ -15,9 +17,8 @@ defineOptions({
 
 <style scoped>
 
-h1 {
-  text-align: center; 
-  padding-bottom:20px;
+.content-wrapper {
+  margin: 20px 0;
 }
 
 </style>

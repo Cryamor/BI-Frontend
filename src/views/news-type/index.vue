@@ -1,43 +1,51 @@
 <template>
-  <div>
-    <h1>新闻种类变化情况</h1>
-    <el-row :gutter="20" justify="space-evenly">
-      <el-col :span="6">
-        <el-select
-          v-model="typeSelected"
-          placeholder="Select"
-          size="large"
-          style="width: 240px"
-        >
-          <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
+  <div style="margin: 0 30px;">
+    <!-- <h1>新闻种类变化情况</h1> -->
+    <el-card shadow="never" class="search-wrapper">
+      <el-form 
+        :model="searchForm" 
+        :rules="rules"
+        ref="searchFormRef"
+        label-width="auto" 
+        label-position="left" 
+        :size="formSize"
+        status-icon
+        style="max-width:600px"
+      >
+        <el-form-item label="新闻种类" prop="type">
+          <el-select v-model="searchForm.type" placeholder="选择要查询的新闻种类">
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="起止时间" prop="time">
+          <el-date-picker
+            v-model="searchForm.time"
+            type="daterange"
+            unlink-panels
+            range-separator="To"
+            start-placeholder="起始时间"
+            end-placeholder="终止时间"
+            :shortcuts="shortcuts"
           />
-        </el-select>
-      </el-col>
-      <el-col :span="10">
-        <el-date-picker
-          v-model="dateSelected"
-          type="daterange"
-          unlink-panels
-          range-separator="To"
-          start-placeholder="Start month"
-          end-placeholder="End month"
-          :shortcuts="shortcuts"
-          size="large"
-        />
-      </el-col>
-      <el-col :span="4">
-        <el-button type="primary" @click="search" size="large">查询</el-button>
-      </el-col>
-  
-    </el-row>
+        </el-form-item>
+        <el-form-item label="">
+          <el-button @click="submitForm(searchFormRef)" type="primary">查询</el-button>
+          <el-button @click="resetForm(searchFormRef)">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </el-card>
 
-    <el-row>
-      <div id="ct2"></div>
-    </el-row>
+    <el-card shadow="never">
+      <el-row>
+        <div id="ct2"></div>
+      </el-row>
+    </el-card>
+
   </div>
 
 </template>
@@ -45,8 +53,8 @@
 <script lang="ts" setup>
 
 import * as echarts from "echarts";
-import { onMounted, ref } from "vue";
-import { ElMessage } from "element-plus";
+import { onMounted, ref, reactive } from "vue";
+import type { ComponentSize, FormInstance, FormRules } from 'element-plus'
 
 defineOptions({
   name: "NewsType"
@@ -56,8 +64,18 @@ let Chart = null
 let xdata = []
 let ydata = []
 
-const dateSelected = ref()
-const typeSelected = ref()
+interface SearchForm {
+  type: string
+  time: Date[]
+}
+
+const searchForm = reactive<SearchForm>({
+  type: '',
+  time: [],
+})
+
+const formSize = ref<ComponentSize>('default')
+const searchFormRef = ref<FormInstance>()
 
 const options = [
   {
@@ -113,6 +131,40 @@ const shortcuts = [
     },
   },
 ]
+
+const rules = reactive<FormRules<SearchForm>>({
+  type: [
+    {
+      required: true,
+      message: '请选择新闻种类',
+      trigger: 'change'
+    }
+  ],
+  time: [
+    {
+      required: true,
+      message: '请选择起止时间',
+      trigger: 'change'
+    }
+  ]
+})
+
+const submitForm = async (formEl: FormInstance | undefined) => {
+  if (!formEl) return
+  await formEl.validate((valid, fields) => {
+    if (valid) {
+      console.log('submit!')
+      search()
+    } else {
+      console.log('error submit!', fields)
+    }
+  })
+}
+
+const resetForm = (formEl: FormInstance | undefined) => {
+  if (!formEl) return
+  formEl.resetFields()
+}
 
 onMounted(() => {
   init()
@@ -174,7 +226,7 @@ function clearData() {
 function updateChart() {
   Chart.setOption({
     title: {
-      text: `[${typeSelected.value}]新闻日流量变化`
+      text: `[${searchForm.type}]新闻日流量变化`
     },
     xAxis: {
       data: xdata
@@ -189,13 +241,7 @@ function updateChart() {
 }
 
 function search() {
-
-  console.log(typeSelected.value)
-  if (typeSelected.value === undefined || typeSelected.value == '') {
-    ElMessage.error('种类不能为空')
-    return
-  }
-
+  console.log(searchForm)
   clearData()
   simulateData()
   updateChart()
@@ -249,6 +295,14 @@ h1 {
   height: 500px;
   width: 100%;
   margin-top: 30px;
+}
+
+.search-wrapper {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  :deep(.el-card__body) {
+    padding-bottom: 2px;
+  }
 }
 
 </style>
