@@ -10,7 +10,8 @@
         label-position="left" 
         :size="formSize"
         status-icon
-        style="max-width:600px"
+        style="max-width:900px"
+        :inline="true"
       >
         <el-form-item label="用户ID" prop="id">
           <el-input v-model="searchForm.id" clearable placeholder="请输入要查询的用户ID" />
@@ -43,14 +44,16 @@
 import * as echarts from "echarts";
 import { onMounted, reactive, ref } from 'vue'
 import type { ComponentSize, FormInstance, FormRules } from 'element-plus'
+import { title } from "process";
 
 defineOptions({
   name: "Interest"
 })
 
 let Chart = null
-let xdata = ['运动','金融','政治','科技','八卦','穿搭','游戏']
-let ydata = []
+let xdata = ['运动','经济','政治','科技','八卦','穿搭','游戏','军事']
+let ydata = [100,25,70,43,5]
+let lastydata = []
 
 interface SearchForm {
   id: string
@@ -60,9 +63,11 @@ interface SearchForm {
 const formSize = ref<ComponentSize>('default')
 
 const searchForm = reactive<SearchForm>({
-  id: '',
-  time: [],
+  id: '123',
+  time: [new Date(2009,0,31), new Date()],
 })
+
+let lastSearchForm = JSON.parse(JSON.stringify(searchForm))
 
 const searchFormRef = ref<FormInstance>()
 
@@ -120,6 +125,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       console.log('submit!')
+      search()
     } else {
       console.log('error submit!', fields)
     }
@@ -140,27 +146,70 @@ function init() {
   let options = {
     title: {
       text: '用户兴趣偏好',
-      left: 'center'
+      left: 'center',
+      subtext: '上次所选范围: 无',
     },
     tooltip: {},
+    legend: {
+      right: '20',
+      data: ['所选范围浏览量', '上次所选范围浏览量']
+    },
     xAxis: {
       name: '主题',
       data: xdata
     },
     yAxis: {
-      name: '日浏览量'
+      name: '浏览量'
     },
     series: [
       {
-        name: '日浏览量',
+        name: '所选范围浏览量',
         type: 'bar',
-        data: [100,25,70,43,5]
+        data: ydata
+      },
+      {
+        name: '上次所选范围浏览量',
+        type: 'bar',
+        data: lastydata
       }
     ]
     
   }
 
   Chart.setOption(options)
+}
+
+function search() {
+  Object.assign(lastydata, ydata)
+  ydata = [11,45,14,191,98,10,233,33]
+
+  Chart.setOption({
+    series: [
+      {
+        name: '所选范围浏览量',
+        data: ydata
+      },
+      {
+        name: '上次所选范围浏览量',
+        data: lastydata
+      }
+    ],
+  })
+
+  let lastid = lastSearchForm.id
+  let lasttime = [new Date(lastSearchForm.time[0]), new Date(lastSearchForm.time[1])]
+
+  if (lastid != null && lastid != '') {
+    Chart.setOption({
+      title: {
+        subtext: `上次所选范围: [用户ID: ${lastid}, 时间范围: ${lasttime[0].toLocaleDateString()} ~ ${lasttime[1].toLocaleDateString()}]`
+      }
+    })
+  }
+
+  // lastSearchForm = JSON.parse(JSON.stringify(searchForm))
+  Object.assign(lastSearchForm, searchForm)
+
 }
 
 </script>

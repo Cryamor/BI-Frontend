@@ -10,7 +10,7 @@
         label-position="left" 
         :size="formSize"
         status-icon
-        style="max-width:600px"
+        :inline="true"
       >
         <el-form-item label="新闻种类" prop="type">
           <el-select v-model="searchForm.type" placeholder="选择要查询的新闻种类">
@@ -70,8 +70,8 @@ interface SearchForm {
 }
 
 const searchForm = reactive<SearchForm>({
-  type: '',
-  time: [],
+  type: '运动',
+  time: [new Date(2010,0,1), new Date()],
 })
 
 const formSize = ref<ComponentSize>('default')
@@ -83,8 +83,8 @@ const options = [
     label: '运动',
   },
   {
-    value: 'Option2',
-    label: 'Option2',
+    value: '经济',
+    label: '经济',
   },
   {
     value: 'Option3',
@@ -226,7 +226,7 @@ function clearData() {
 function updateChart() {
   Chart.setOption({
     title: {
-      text: `[${searchForm.type}]新闻日流量变化`
+      text: `${searchForm.type}新闻日流量变化`
     },
     xAxis: {
       data: xdata
@@ -271,7 +271,6 @@ function simulateData() {
     }
   ]
 
-
   data.forEach(ele => {
     xdata.push(ele.date)
     ydata.push(ele.clickNum)
@@ -302,6 +301,15 @@ h1 {
   margin-bottom: 20px;
   :deep(.el-card__body) {
     padding-bottom: 2px;
+  }
+}
+
+/* 在版本 2.5.0之后， el-select 的默认宽度更改为 100% 当使用内联形式时，宽度将显示异常。 */
+.el-form--inline {
+  .el-form-item {
+    & > .el-input, .el-cascader, .el-select, .el-date-editor, .el-autocomplete {
+      width: 240px;
+    }
   }
 }
 

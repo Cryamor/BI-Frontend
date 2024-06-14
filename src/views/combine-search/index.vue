@@ -1,71 +1,66 @@
 <template>
   <div style="margin: 0 30px;">
-    <el-row justify="space-evenly">
-      <el-col :span="15">
-        <el-card shadow="never" class="search-wrapper">
-          <el-form 
-            ref="searchFormRef"
-            :model="searchForm"
-            :rules="rules"
-            label-width="auto" 
-            label-position="left" 
-            :size="formSize"
-            status-icon
-            style="max-width:600px"
-          >
-            <el-form-item label="新闻主题" prop="topic">
-              <el-select v-model="searchForm.topic" placeholder="选择要查询的新闻主题">
-                <el-option
-                  v-for="item in options"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="起止时间" prop="time">
-              <el-date-picker
-                v-model="searchForm.time"
-                type="daterange"
-                unlink-panels
-                range-separator="To"
-                start-placeholder="起始时间"
-                end-placeholder="终止时间"
-                :shortcuts="shortcuts"
-              />
-            </el-form-item>
-            <el-form-item label="标题长度" prop="titleLen">
-              <el-slider 
-                v-model="searchForm.titleLen" 
-                range 
-                show-stops 
-                :max="20" 
-                :min="0"
-                :marks="marks"
-                style="margin-bottom: 10px;"
-              />
-            </el-form-item>
-            <el-form-item label="">
-              <el-button @click="submitForm(searchFormRef)" type="primary">查询</el-button>
-              <el-button @click="resetForm(searchFormRef)">重置</el-button>
-            </el-form-item>
-          </el-form>
-        </el-card>
-    
-        <el-card shadow="never">
-          
-        </el-card>
-      </el-col>
-      <el-col :span="8">
-        <el-card shadow="never" class="content-wrapper">
-          <div class="content-container" v-if="showNewsDetail">
-            <h2> {{newsSelected.title}} </h2>
-            <div class="news-time">发布时间: {{newsSelected.time}} </div>
-            <div class="news-content">{{newsSelected.content}} </div>
-          </div>
-        </el-card>
-      </el-col>
-    </el-row>
+    <el-card shadow="never" class="search-wrapper">
+      <el-form 
+        ref="searchFormRef"
+        :model="searchForm"
+        :rules="rules"
+        label-width="auto" 
+        label-position="left" 
+        :size="formSize"
+        status-icon
+        style="max-width:600px"
+      >
+        <el-form-item label="新闻主题" prop="topic">
+          <el-select v-model="searchForm.topic" placeholder="选择要查询的新闻主题">
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="起止时间" prop="time">
+          <el-date-picker
+            v-model="searchForm.time"
+            type="daterange"
+            unlink-panels
+            range-separator="To"
+            start-placeholder="起始时间"
+            end-placeholder="终止时间"
+            :shortcuts="shortcuts"
+          />
+        </el-form-item>
+        <el-form-item label="标题长度" prop="titleLen">
+          <el-slider 
+            v-model="searchForm.titleLen" 
+            range 
+            show-stops 
+            :max="20" 
+            :min="0"
+            :marks="marks"
+            style="margin-bottom: 10px;"
+          />
+        </el-form-item>
+        <el-form-item label="">
+          <el-button @click="submitForm(searchFormRef)" type="primary">查询</el-button>
+          <el-button @click="resetForm(searchFormRef)">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </el-card>
+
+    <el-card shadow="never">
+      <el-table :data="tableData" stripe style="width: 100%">
+      <el-table-column label="ID" prop="id" width="200"/>
+      <el-table-column label="标题" prop="title" width="200"/>
+      <el-table-column label="发布时间" prop="time" width="200"/>
+      <el-table-column label="种类" prop="type" width="150"/>
+      <el-table-column label="主题" prop="topic" width="150"/>
+      <el-table-column label="内容" prop="content"/>
+
+      </el-table>
+    </el-card>
 
   </div>
 </template>
@@ -79,6 +74,24 @@ defineOptions({
   name: "CombineSearch"
 })
 
+const tableData = [
+  {
+    id: '1',
+    time: new Date().toLocaleString(),
+    title: '',
+    content: '',
+    type: '',
+    topic: ''
+  },
+  {
+    id: '2',
+    time: new Date().toLocaleString(),
+    title: '',
+    content: '',
+    type: '',
+    topic: ''
+  },
+]
 const showNewsDetail = ref(false)
 const newsSelected = ref({
   title: '',

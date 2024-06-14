@@ -79,23 +79,23 @@ export const constantRoutes: RouteRecordRaw[] = [
       }
     ]
   },
-  // {
-  //   path: "/news-search",
-  //   component: Layouts,
-  //   redirect: "/test1/index",
-  //   children: [
-  //     {
-  //       path: "news-search",
-  //       component: () => import("@/views/news-search/index.vue"),
-  //       name: "NewsSearch",
-  //       meta: {
-  //         title: "新闻查询",
-  //         elIcon: "Reading",
-  //         keepAlive: true,
-  //       }
-  //     }
-  //   ]
-  // },
+  {
+    path: "/lifecircle",
+    component: Layouts,
+    redirect: "/lifecircle/index",
+    children: [
+      {
+        path: "index",
+        component: () => import("@/views/lifecircle/index.vue"),
+        name: "LifeCircle",
+        meta: {
+          elIcon: "Clock",
+          title: "生命周期",
+          keepAlive: true
+        }
+      }
+    ]
+  },
   {
     path: "/news-type",
     component: Layouts,
@@ -206,36 +206,36 @@ export const constantRoutes: RouteRecordRaw[] = [
   //     }
   //   ]
   // },
-  {
-    path: "/table",
-    component: Layouts,
-    redirect: "/table/element-plus",
-    name: "Table",
-    meta: {
-      title: "表格",
-      elIcon: "Grid"
-    },
-    children: [
-      {
-        path: "element-plus",
-        component: () => import("@/views/table/element-plus/index.vue"),
-        name: "ElementPlus",
-        meta: {
-          title: "Element Plus",
-          keepAlive: true
-        }
-      },
-      {
-        path: "vxe-table",
-        component: () => import("@/views/table/vxe-table/index.vue"),
-        name: "VxeTable",
-        meta: {
-          title: "Vxe Table",
-          keepAlive: true
-        }
-      }
-    ]
-  },
+  // {
+  //   path: "/table",
+  //   component: Layouts,
+  //   redirect: "/table/element-plus",
+  //   name: "Table",
+  //   meta: {
+  //     title: "表格",
+  //     elIcon: "Grid"
+  //   },
+  //   children: [
+  //     {
+  //       path: "element-plus",
+  //       component: () => import("@/views/table/element-plus/index.vue"),
+  //       name: "ElementPlus",
+  //       meta: {
+  //         title: "Element Plus",
+  //         keepAlive: true
+  //       }
+  //     },
+  //     {
+  //       path: "vxe-table",
+  //       component: () => import("@/views/table/vxe-table/index.vue"),
+  //       name: "VxeTable",
+  //       meta: {
+  //         title: "Vxe Table",
+  //         keepAlive: true
+  //       }
+  //     }
+  //   ]
+  // },
   // {
   //   path: "/menu",
   //   component: Layouts,
