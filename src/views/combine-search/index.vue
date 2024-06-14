@@ -51,7 +51,7 @@
     </el-card>
 
     <el-card shadow="never">
-      <el-table :data="tableData" stripe style="width: 100%">
+      <el-table :data="tableData" style="width: 100%">
       <el-table-column label="ID" prop="id" width="200"/>
       <el-table-column label="标题" prop="title" width="200"/>
       <el-table-column label="发布时间" prop="time" width="200"/>
