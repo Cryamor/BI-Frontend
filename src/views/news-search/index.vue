@@ -311,13 +311,13 @@ function searchByTitle() {
   console.log('searchByTitle:', searchForm2.title, 'page:', curPage.value)
   axios.get('http://localhost:8080/news/getNewsByHeadline',{
     params: {
-      title: searchForm2.title,
+      headline: searchForm2.title,
       pageNum: curPage.value,
       pageSize: pageSize
     }
   })
   .then(res => {
-    console.log(res)
+    console.log(11,res)
     if (res.status == 200) {
       clearTable()
       const data = res.data

@@ -12,8 +12,8 @@
         style="max-width:1000px;"
         :inline="true"
       >
-        <el-form-item label="新闻主题" prop="topic">
-          <el-select v-model="searchForm.topic" placeholder="选择要查询的新闻主题">
+        <el-form-item label="新闻主题" prop="category">
+          <el-select v-model="searchForm.category" placeholder="选择要查询的新闻主题">
             <el-option
               v-for="item in options"
               :key="item.value"
@@ -37,7 +37,7 @@
           <el-slider 
             v-model="searchForm.titleLen" 
             range 
-            :max="20" 
+            :max="200" 
             :min="0"
             :marks="marks"
             style="margin-bottom: 10px;"
@@ -77,7 +77,8 @@
 
       </el-table>
       <div class="pagination-block">
-        <el-pagination layout="prev, pager, next" :total="pageSum" />
+        <el-button :disabled="curPage <= 1" @click="lastPage">上一页</el-button>
+        <el-button :disabled="!hasSearched" type="primary" @click="nextPage">下一页</el-button>
       </div>
     </el-card>
 
@@ -88,6 +89,8 @@
 
 import { ref, reactive, onMounted, CSSProperties } from 'vue'
 import type { ComponentSize, FormInstance, FormRules } from 'element-plus'
+import { formatDateTime } from '@/api/format/format-time'
+import axios from 'axios';
 
 defineOptions({
   name: "CombineSearch"
@@ -101,10 +104,21 @@ const newsSelected = ref({
   content: ''
 })
 
-const pageSum = ref(1)
+const curPage = ref(1)
+const pageSize = 10
+const hasSearched = ref(false)
+
+const nextPage = () => {
+  curPage.value += 1
+  search()
+}
+const lastPage = () => {
+  curPage.value -= 1
+  search()
+}
 
 interface SearchForm {
-  topic: string,
+  category: string,
   time: Date[],
   titleLen: number[],
   contentLen: number[],
@@ -112,9 +126,9 @@ interface SearchForm {
 }
 
 const searchForm = reactive<SearchForm>({
-  topic: '',
-  time: [],
-  titleLen: [5,20],
+  category: '',
+  time: [new Date(2010,0,1), new Date()],
+  titleLen: [10,200],
   contentLen: [20,200],
   user: '1'
 })
@@ -123,29 +137,80 @@ const formSize = ref<ComponentSize>('default')
 const searchFormRef = ref<FormInstance>()
 
 const rules = reactive<FormRules<SearchForm>>({
-
 })
 
 const options = [
   {
-    value: '运动',
-    label: '运动',
+    value: 'sports',
+    label: 'sports',
   },
   {
-    value: 'Option2',
-    label: 'Option2',
+    value: 'news',
+    label: 'news',
   },
   {
-    value: 'Option3',
-    label: 'Option3',
+    value: 'autos',
+    label: 'autos',
   },
   {
-    value: 'Option4',
-    label: 'Option4',
+    value: 'foodanddrink',
+    label: 'foodanddrink',
   },
   {
-    value: 'Option5',
-    label: 'Option5',
+    value: 'finance',
+    label: 'finance',
+  },
+  {
+    value: 'music',
+    label: 'music',
+  },
+  {
+    value: 'lifestyle',
+    label: 'lifestyle',
+  },
+  {
+    value: 'weather',
+    label: 'weather',
+  },
+  {
+    value: 'health',
+    label: 'health',
+  },
+  {
+    value: 'video',
+    label: 'video',
+  },
+  {
+    value: 'movies',
+    label: 'movies',
+  },
+  {
+    value: 'tv',
+    label: 'tv',
+  },
+  {
+    value: 'travel',
+    label: 'travel',
+  },
+  {
+    value: 'entertainment',
+    label: 'entertainment',
+  },
+  {
+    value: 'kids',
+    label: 'kids',
+  },
+  {
+    value: 'europe',
+    label: 'europe',
+  },
+  {
+    value: 'northamerica',
+    label: 'northamerica',
+  },
+  {
+    value: 'adexperience',
+    label: 'adexperience',
   },
 ]
 
@@ -189,10 +254,12 @@ type Marks = Record<number, Mark | string>
 
 const marks = reactive<Marks>({
   0: '0',
-  20: '20',
-  15: '15',
-  5: '5',
-  10: {
+  // 20: '20',
+  // 15: '15',
+  // 5: '5',
+  50: '50',
+  150: '150',
+  100: {
     style: {
       color: '#1989FA',
     },
@@ -206,6 +273,8 @@ const submitForm = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       console.log('submit!')
+      curPage.value = 1
+      hasSearched.value = true
       search()
     } else {
       console.log('error submit!', fields)
@@ -218,8 +287,44 @@ const resetForm = (formEl: FormInstance | undefined) => {
   formEl.resetFields()
 }
 
-function search() {
-  console.log(searchForm)
+const clearTable = () => {
+  tableData.splice(0, tableData.length)
+}
+
+async function search() {
+  console.log('search:', searchForm, 'page:', curPage.value)
+  await axios.get('http://localhost:8080/news/getNewsByMultipleConditions', {
+    params: {
+      category: searchForm.category,
+      startTime: formatDateTime(searchForm.time[0]),
+      endTime: formatDateTime(searchForm.time[1]),
+      minLen: searchForm.titleLen[0],
+      maxLen: searchForm.titleLen[1],
+      userId: searchForm.user,
+      pageNum: curPage.value,
+      pageSize: pageSize
+    }
+  })
+  .then(res => {
+    console.log(res)
+    if (res.status == 200) {
+      const data = res.data
+      clearTable()
+      data.forEach(ele => {
+        let item = {
+          id: ele.news_id,
+          title: ele.headline,
+          content: ele.content,
+          category: ele.category,
+          topic: ele.topic
+        }
+        tableData.push(item)
+      })
+    }
+  })
+  .catch(err => {
+    console.log(err)
+  })
 }
 
 

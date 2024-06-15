@@ -45,14 +45,16 @@ import * as echarts from "echarts";
 import { onMounted, reactive, ref } from 'vue'
 import type { ComponentSize, FormInstance, FormRules } from 'element-plus'
 import { title } from "process";
+import axios from "axios";
+import { formatDateTime } from '@/api/format/format-time'
 
 defineOptions({
   name: "Interest"
 })
 
 let Chart = null
-let xdata = ['运动','经济','政治','科技','八卦','穿搭','游戏','军事']
-let ydata = [100,25,70,43,5]
+let xdata = []
+let ydata = []
 let lastydata = []
 
 interface SearchForm {
@@ -63,7 +65,7 @@ interface SearchForm {
 const formSize = ref<ComponentSize>('default')
 
 const searchForm = reactive<SearchForm>({
-  id: '123',
+  id: '111',
   time: [new Date(2009,0,31), new Date()],
 })
 
@@ -179,8 +181,27 @@ function init() {
   Chart.setOption(options)
 }
 
-function search() {
+async function search() {
+  console.log('user id:', searchForm.id, 'time:', searchForm.time)
   Object.assign(lastydata, ydata)
+
+  await axios.get('http://localhost:8080/news/getUserTopic', {
+    params: {
+      userId: searchForm.id,
+      startTime: formatDateTime(searchForm.time[0]),
+      endTime: formatDateTime(searchForm.time[1])
+    }
+  })
+  .then(res => {
+    console.log(res)
+    if (res.status == 200) {
+
+    }
+  })
+  .catch(err => {
+    console.log(err)
+  })
+
   ydata = [11,45,14,191,98,10,233,33]
 
   Chart.setOption({
@@ -207,9 +228,12 @@ function search() {
     })
   }
 
-  // lastSearchForm = JSON.parse(JSON.stringify(searchForm))
   Object.assign(lastSearchForm, searchForm)
 
+}
+
+function arrange() {
+  
 }
 
 </script>
