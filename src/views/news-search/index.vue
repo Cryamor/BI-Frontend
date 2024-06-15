@@ -60,7 +60,7 @@
         style="max-width:600px"
         v-if="radio=='按类别查询'"
       >
-        <el-form-item label="新闻标题" prop="category">
+        <el-form-item label="新闻类别" prop="category">
           <el-select v-model="searchForm3.category" placeholder="选择要查询的新闻类别">
             <el-option
               v-for="item in options"
@@ -80,13 +80,16 @@
 
     <el-card shadow="never">
       <el-table :data="tableData" style="width: 100%">
-      <el-table-column label="ID" prop="id" width="200"/>
-      <el-table-column label="标题" prop="title" width="200"/>
+      <el-table-column label="ID" prop="id" width="150"/>
+      <el-table-column label="标题" prop="title" width="300"/>
       <el-table-column label="类别" prop="category" width="150"/>
       <el-table-column label="主题" prop="topic" width="150"/>
-      <el-table-column label="内容" prop="content"/>
-
+      <el-table-column label="内容" prop="content" show-overflow-tooltip/>
       </el-table>
+      <div style="margin-top:20px;">
+        <el-button :disabled="curPage <= 1" @click="lastPage">上一页</el-button>
+        <el-button :disabled="!hasSearched" type="primary" @click="nextPage">下一页</el-button>
+      </div>
     </el-card>
 
   </div>
@@ -102,23 +105,10 @@ import type { ComponentSize, FormInstance, FormRules } from 'element-plus'
 import axios from 'axios';
 import { table } from 'console';
 
+const curPage = ref(1)
+const pageSize = 10
 const radio = ref('按ID查询')
-const tableData = [
-  {
-    id: '1',
-    title: '',
-    content: '',
-    category: '',
-    topic: ''
-  },
-  {
-    id: '2',
-    title: '',
-    content: '',
-    category: '',
-    topic: ''
-  },
-]
+const tableData = reactive([])
 const showNewsDetail = ref(false)
 const newsSelected = ref({
   title: '',
@@ -127,6 +117,7 @@ const newsSelected = ref({
   topic: '',
   id: '',
 })
+const hasSearched = ref(false)
 
 interface SearchForm1 {
   id: string
@@ -162,24 +153,76 @@ const rules3 = reactive<FormRules<SearchForm3>>({
 
 const options = [
   {
-    value: '运动',
-    label: '运动',
+    value: 'sports',
+    label: 'sports',
   },
   {
-    value: 'Option2',
-    label: 'Option2',
+    value: 'news',
+    label: 'news',
   },
   {
-    value: 'Option3',
-    label: 'Option3',
+    value: 'autos',
+    label: 'autos',
   },
   {
-    value: 'Option4',
-    label: 'Option4',
+    value: 'foodanddrink',
+    label: 'foodanddrink',
   },
   {
-    value: 'Option5',
-    label: 'Option5',
+    value: 'finance',
+    label: 'finance',
+  },
+  {
+    value: 'music',
+    label: 'music',
+  },
+  {
+    value: 'lifestyle',
+    label: 'lifestyle',
+  },
+  {
+    value: 'weather',
+    label: 'weather',
+  },
+  {
+    value: 'health',
+    label: 'health',
+  },
+  {
+    value: 'video',
+    label: 'video',
+  },
+  {
+    value: 'movies',
+    label: 'movies',
+  },
+  {
+    value: 'tv',
+    label: 'tv',
+  },
+  {
+    value: 'travel',
+    label: 'travel',
+  },
+  {
+    value: 'entertainment',
+    label: 'entertainment',
+  },
+  {
+    value: 'kids',
+    label: 'kids',
+  },
+  {
+    value: 'europe',
+    label: 'europe',
+  },
+  {
+    value: 'northamerica',
+    label: 'northamerica',
+  },
+  {
+    value: 'adexperience',
+    label: 'adexperience',
   },
 ]
 
@@ -188,6 +231,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       console.log('submit!')
+      curPage.value = 1;
       search()
     } else {
       console.log('error submit!', fields)
@@ -204,7 +248,17 @@ const clearTable = () => {
   tableData.splice(0, tableData.length)
 }
 
+const nextPage = () => {
+  curPage.value += 1
+  search()
+}
+const lastPage = () => {
+  curPage.value -= 1
+  search()
+}
+
 function search() {
+  hasSearched.value = true
   switch(radio.value) {
     case '按ID查询':{
       searchById()
@@ -231,7 +285,7 @@ function searchById() {
   .then(res => {
     if (res.status == 200) {
       clearTable()
-      newsSelected.value.title = res.data.title
+      newsSelected.value.title = res.data.headline
       newsSelected.value.content = res.data.content
       newsSelected.value.id = res.data.news_id
       newsSelected.value.topic = res.data.topic
@@ -239,12 +293,13 @@ function searchById() {
 
       let ele = {
         id: res.data.news_id,
-        title: res.data.title,
-        content: res.data.headline,
+        title: res.data.headline,
+        content: res.data.content,
         category: res.data.category,
         topic: res.data.topic
       }
       tableData.push(ele)
+      console.log(res)
     }
   })
   .catch(err => {
@@ -253,21 +308,24 @@ function searchById() {
 }
 
 function searchByTitle() {
-  console.log('searchByTitle:', searchForm2.title)
-  axios.get('http://localhost:8080/news/getNewsByTitle',{
+  console.log('searchByTitle:', searchForm2.title, 'page:', curPage.value)
+  axios.get('http://localhost:8080/news/getNewsByHeadline',{
     params: {
-      category: searchForm2.title 
+      title: searchForm2.title,
+      pageNum: curPage.value,
+      pageSize: pageSize
     }
   })
   .then(res => {
+    console.log(res)
     if (res.status == 200) {
       clearTable()
       const data = res.data
       data.forEach(ele => {
         let item = {
           id: ele.news_id,
-          title: ele.title,
-          content: ele.headline,
+          title: ele.headline,
+          content: ele.content,
           category: ele.category,
           topic: ele.topic
         }
@@ -282,10 +340,12 @@ function searchByTitle() {
 }
 
 function searchByCategory() {
-  console.log('searchByCate:', searchForm3.category)
+  console.log('searchByCate:', searchForm3.category, 'page:', curPage.value)
   axios.get('http://localhost:8080/news/getNewsByCategory',{
     params: {
-      category: searchForm3.category 
+      category: searchForm3.category,
+      pageNum: curPage.value,
+      pageSize: pageSize
     }
   })
   .then(res => {
@@ -295,8 +355,8 @@ function searchByCategory() {
       data.forEach(ele => {
         let item = {
           id: ele.news_id,
-          title: ele.title,
-          content: ele.headline,
+          title: ele.headline,
+          content: ele.content,
           category: ele.category,
           topic: ele.topic
         }

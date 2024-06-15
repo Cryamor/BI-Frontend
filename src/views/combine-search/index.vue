@@ -9,7 +9,8 @@
         label-position="left" 
         :size="formSize"
         status-icon
-        style="max-width:600px"
+        style="max-width:1000px;"
+        :inline="true"
       >
         <el-form-item label="新闻主题" prop="topic">
           <el-select v-model="searchForm.topic" placeholder="选择要查询的新闻主题">
@@ -36,14 +37,29 @@
           <el-slider 
             v-model="searchForm.titleLen" 
             range 
-            show-stops 
             :max="20" 
             :min="0"
             :marks="marks"
             style="margin-bottom: 10px;"
           />
         </el-form-item>
-        <el-form-item label="">
+        <el-form-item label="内容长度" prop="contentLen">
+          <el-input-number
+            v-model="searchForm.contentLen[0]" 
+            :min="0"
+            controls-position="right"
+          />
+          <span style="width: 50px; text-align:center;">To</span>
+          <el-input-number 
+            v-model="searchForm.contentLen[1]" 
+            :max="9999999"
+            controls-position="right"
+          />
+        </el-form-item>
+        <el-form-item label="用户" prop="user">
+          <el-input v-model="searchForm.user" clearable placeholder="请输入用户ID"> </el-input>
+        </el-form-item>
+        <el-form-item label="" style="width:800px;">
           <el-button @click="submitForm(searchFormRef)" type="primary">查询</el-button>
           <el-button @click="resetForm(searchFormRef)">重置</el-button>
         </el-form-item>
@@ -55,11 +71,14 @@
       <el-table-column label="ID" prop="id" width="200"/>
       <el-table-column label="标题" prop="title" width="200"/>
       <el-table-column label="发布时间" prop="time" width="200"/>
-      <el-table-column label="种类" prop="type" width="150"/>
+      <el-table-column label="种类" prop="category" width="150"/>
       <el-table-column label="主题" prop="topic" width="150"/>
       <el-table-column label="内容" prop="content"/>
 
       </el-table>
+      <div class="pagination-block">
+        <el-pagination layout="prev, pager, next" :total="pageSum" />
+      </div>
     </el-card>
 
   </div>
@@ -74,24 +93,7 @@ defineOptions({
   name: "CombineSearch"
 })
 
-const tableData = [
-  {
-    id: '1',
-    time: new Date().toLocaleString(),
-    title: '',
-    content: '',
-    type: '',
-    topic: ''
-  },
-  {
-    id: '2',
-    time: new Date().toLocaleString(),
-    title: '',
-    content: '',
-    type: '',
-    topic: ''
-  },
-]
+const tableData = reactive([])
 const showNewsDetail = ref(false)
 const newsSelected = ref({
   title: '',
@@ -99,16 +101,22 @@ const newsSelected = ref({
   content: ''
 })
 
+const pageSum = ref(1)
+
 interface SearchForm {
   topic: string,
   time: Date[],
   titleLen: number[],
+  contentLen: number[],
+  user: string
 }
 
 const searchForm = reactive<SearchForm>({
   topic: '',
   time: [],
-  titleLen: [5,20]
+  titleLen: [5,20],
+  contentLen: [20,200],
+  user: '1'
 })
 
 const formSize = ref<ComponentSize>('default')
@@ -192,6 +200,7 @@ const marks = reactive<Marks>({
   },
 })
 
+
 const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
@@ -250,5 +259,13 @@ function search() {
   overflow-wrap: break-word;
 }
 
+/* 在版本 2.5.0之后， el-select 的默认宽度更改为 100% 当使用内联形式时，宽度将显示异常。 */
+.el-form--inline {
+  .el-form-item {
+    & > .el-input, .el-cascader, .el-select, .el-date-editor, .el-autocomplete, .el-slider {
+      width: 400px;
+    }
+  }
+}
 
 </style>

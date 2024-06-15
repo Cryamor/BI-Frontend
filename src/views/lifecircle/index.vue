@@ -48,7 +48,7 @@
         <el-card shadow="never" class="content-wrapper">
           <div class="content-container" v-if="showNewsDetail">
             <h2> {{newsSelected.title}} </h2>
-            <div class="news-time">发布时间: {{newsSelected.time}} </div>
+            <div class="news-time">类别: {{newsSelected.category}} 主题: {{newsSelected.topic}} </div>
             <div class="news-content">{{newsSelected.content}} </div>
           </div>
         </el-card>
@@ -74,7 +74,13 @@ let Chart = null
 let xdata = []
 let ydata = []
 
-const newsSelected = ref()
+const newsSelected = ref({
+  title: '',
+  content: '',
+  category: '',
+  topic: '',
+  id: '',
+})
 const showNewsDetail = ref(false)
 
 interface SearchForm {
@@ -142,7 +148,6 @@ const shortcuts = [
 onMounted(() => {
   init()
   getData()
-  // test3()
 });
 
 const submitForm = async (formEl: FormInstance | undefined) => {
@@ -160,79 +165,6 @@ const submitForm = async (formEl: FormInstance | undefined) => {
 const resetForm = (formEl: FormInstance | undefined) => {
   if (!formEl) return
   formEl.resetFields()
-}
-
-function test1() {
-
-  axios.get('http://localhost:8080/news/getNewsById', {
-    params: {
-      newsId:1
-    }
-  })
-  .then(res => {
-    console.log(res)
-  })
-  .catch(err => {
-    console.log(err)
-  })
-
-  /*
-  data:
-    browser_duration
-    browser_num
-    category
-    content
-    headline
-    news_id
-    topic
-  */
-
-}
-
-function test2() {
-
-  axios.get('http://localhost:8080/news/getNewsLifeCircle', {
-    params: {
-      newsId:13894,
-      startTime: '2010-01-01 00:00:00',
-      endTime: '2030-01-01 00:00:00',
-    }
-  })
-  .then(res => {
-    console.log('res',res)
-  })
-  .catch(err => {
-    console.log(err)
-  })
-
-  /*
-  data:
-    Array({clickNum, date})
-  */
-
-}
-
-function test3() {
-
-  axios.get('http://localhost:8080/news/getCategoryClickChange', {
-    params: {
-      category:'entertainment',
-      startTime: '2010-01-01 00:00:00',
-      endTime: '2030-01-01 00:00:00',
-    }
-  })
-  .then(res => {
-    console.log('res',res)
-  })
-  .catch(err => {
-    console.log(err)
-  })
-
-  /*
-  data:
-    Array({clickNum, date})
-  */
-
 }
 
 function init() {
@@ -302,12 +234,49 @@ function updateChart() {
 }
 
 function search() {
-  // console.log(formatDateTime(dateSelected.value[0]), formatDateTime(dateSelected.value[1]))
-
   console.log(searchForm)
 
-  clearData()
-  simulateData()
+  axios.get('http://localhost:8080/news/getNewsLifeCircle', {
+    params: {
+      newsId: searchForm.id,
+      startTime: formatDateTime(searchForm.time[0]),
+      endTime: formatDateTime(searchForm.time[1]),
+    }
+  })
+  .then(res => {
+    if (res.status == 200) {
+      const dataArr = res.data
+      clearData()
+      dataArr.forEach(ele => {
+        xdata.push(ele.date)
+        ydata.push(ele.clickNum)
+      })
+    }
+  })
+  .catch(err => {
+    console.log(err)
+  })
+
+  axios.get('http://localhost:8080/news/getNewsById', {
+    params: {
+      newsId: searchForm.id
+    }
+  })
+  .then(res => {
+    if (res.status == 200) {
+      newsSelected.value.title = res.data.title
+      newsSelected.value.content = res.data.content
+      newsSelected.value.id = res.data.news_id
+      newsSelected.value.topic = res.data.topic
+      newsSelected.value.category = res.data.category
+    }
+  })
+  .catch(err => {
+    console.log(err)
+  })
+
+  // clearData()
+  // simulateData()
   updateChart()
   showNewsDetail.value = true
 }
@@ -348,7 +317,9 @@ function simulateData() {
 
   newsSelected.value = {
     title: '标题',
-    time: '2019-06-17',
+    category: 'entertainment',
+    topic: 'Sport',
+    id: '1',
     content: '新闻内容zsbdzsbdzsbdzsbdzsbdzsbdzsbdzsbdzsbdzsbdzsbdzsbdzsbdzsbdzsbdzsbdzsbdzsbdzsbdzsbdzsbdzsbdzsbdzsbdzsbd',
   }
 

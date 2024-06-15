@@ -9,6 +9,7 @@
         label-width="auto" 
         label-position="left" 
         :size="formSize"
+        style="max-width: 900px;"
         status-icon
         :inline="true"
       >
@@ -33,7 +34,7 @@
             :shortcuts="shortcuts"
           />
         </el-form-item>
-        <el-form-item label="">
+        <el-form-item label="" style="max-width: 800px;">
           <el-button @click="submitForm(searchFormRef)" type="primary">查询</el-button>
           <el-button @click="resetForm(searchFormRef)">重置</el-button>
         </el-form-item>
