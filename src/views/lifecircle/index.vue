@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-row :gutter="20" justify="space-evenly" style="margin-top:20px;">
-      <el-col :span="15">
+      <el-col :span="12">
         <el-card shadow="never" class="search-wrapper">
           <el-form 
             :model="searchForm" 
@@ -44,11 +44,11 @@
 
       </el-col>
 
-      <el-col :span="8">
+      <el-col :span="11">
         <el-card shadow="never" class="content-wrapper">
           <div class="content-container" v-if="showNewsDetail">
             <h2> {{newsSelected.title}} </h2>
-            <div class="news-time">类别: {{newsSelected.category}} 主题: {{newsSelected.topic}} </div>
+            <div class="news-time">类别: {{newsSelected.category}}&nbsp&nbsp&nbsp&nbsp 主题: {{newsSelected.topic}} </div>
             <div class="news-content">{{newsSelected.content}} </div>
           </div>
         </el-card>
@@ -89,7 +89,7 @@ interface SearchForm {
 }
 
 const searchForm = reactive<SearchForm>({
-  id: '',
+  id: '111',
   time: [],
 })
 
@@ -147,7 +147,6 @@ const shortcuts = [
 
 onMounted(() => {
   init()
-  getData()
 });
 
 const submitForm = async (formEl: FormInstance | undefined) => {
@@ -204,16 +203,6 @@ function init() {
 
 }
 
-function getData() {
-  // 请求后端
-  // axios.get(...)
-
-  xdata = ["2018-03-02", "2018-03-03", "2018-03-04", "2018-03-05", "2018-03-06", "2018-03-07"]
-  ydata = [5, 20, 36, 10, 10, 20]
-  updateChart()
-
-}
-
 function clearData() {
   xdata = []
   ydata = []
@@ -233,10 +222,9 @@ function updateChart() {
   })
 }
 
-function search() {
-  console.log(searchForm)
-
-  axios.get('http://localhost:8080/news/getNewsLifeCircle', {
+async function search() {
+  console.log(`news id: ${searchForm.id} time:`, searchForm.time)
+  await axios.get('http://localhost:8080/news/getNewsLifeCircle', {
     params: {
       newsId: searchForm.id,
       startTime: formatDateTime(searchForm.time[0]),
@@ -245,6 +233,7 @@ function search() {
   })
   .then(res => {
     if (res.status == 200) {
+      console.log(res)
       const dataArr = res.data
       clearData()
       dataArr.forEach(ele => {
@@ -264,19 +253,18 @@ function search() {
   })
   .then(res => {
     if (res.status == 200) {
-      newsSelected.value.title = res.data.title
-      newsSelected.value.content = res.data.content
-      newsSelected.value.id = res.data.news_id
-      newsSelected.value.topic = res.data.topic
-      newsSelected.value.category = res.data.category
+      const data = res.data
+      newsSelected.value.title = data.headline
+      newsSelected.value.content = data.content
+      newsSelected.value.id = data.news_id
+      newsSelected.value.topic = data.topic
+      newsSelected.value.category = data.category
     }
   })
   .catch(err => {
     console.log(err)
   })
 
-  // clearData()
-  // simulateData()
   updateChart()
   showNewsDetail.value = true
 }
