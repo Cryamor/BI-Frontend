@@ -13,8 +13,8 @@
         status-icon
         :inline="true"
       >
-        <el-form-item label="新闻种类" prop="type">
-          <el-select v-model="searchForm.type" placeholder="选择要查询的新闻种类">
+        <el-form-item label="新闻类别" prop="type">
+          <el-select v-model="searchForm.type" placeholder="选择要查询的新闻类别">
             <el-option
               v-for="item in options"
               :key="item.value"
@@ -56,6 +56,7 @@
 import * as echarts from "echarts";
 import { onMounted, ref, reactive } from "vue";
 import type { ComponentSize, FormInstance, FormRules } from 'element-plus'
+import axios from "axios";
 
 defineOptions({
   name: "NewsType"
@@ -71,7 +72,7 @@ interface SearchForm {
 }
 
 const searchForm = reactive<SearchForm>({
-  type: '运动',
+  type: 'sports',
   time: [new Date(2010,0,1), new Date()],
 })
 
@@ -80,24 +81,76 @@ const searchFormRef = ref<FormInstance>()
 
 const options = [
   {
-    value: '运动',
-    label: '运动',
+    value: 'sports',
+    label: 'sports',
   },
   {
-    value: '经济',
-    label: '经济',
+    value: 'news',
+    label: 'news',
   },
   {
-    value: 'Option3',
-    label: 'Option3',
+    value: 'autos',
+    label: 'autos',
   },
   {
-    value: 'Option4',
-    label: 'Option4',
+    value: 'foodanddrink',
+    label: 'foodanddrink',
   },
   {
-    value: 'Option5',
-    label: 'Option5',
+    value: 'finance',
+    label: 'finance',
+  },
+  {
+    value: 'music',
+    label: 'music',
+  },
+  {
+    value: 'lifestyle',
+    label: 'lifestyle',
+  },
+  {
+    value: 'weather',
+    label: 'weather',
+  },
+  {
+    value: 'health',
+    label: 'health',
+  },
+  {
+    value: 'video',
+    label: 'video',
+  },
+  {
+    value: 'movies',
+    label: 'movies',
+  },
+  {
+    value: 'tv',
+    label: 'tv',
+  },
+  {
+    value: 'travel',
+    label: 'travel',
+  },
+  {
+    value: 'entertainment',
+    label: 'entertainment',
+  },
+  {
+    value: 'kids',
+    label: 'kids',
+  },
+  {
+    value: 'europe',
+    label: 'europe',
+  },
+  {
+    value: 'northamerica',
+    label: 'northamerica',
+  },
+  {
+    value: 'adexperience',
+    label: 'adexperience',
   },
 ]
 
@@ -169,7 +222,6 @@ const resetForm = (formEl: FormInstance | undefined) => {
 
 onMounted(() => {
   init()
-  getData()
 });
 
 function init() {
@@ -209,16 +261,6 @@ function init() {
 
 }
 
-function getData() {
-  // 请求后端
-  // axios.get(...)
-
-  xdata = ["2018-03-02", "2018-03-03", "2018-03-04", "2018-03-05", "2018-03-06", "2018-03-07"]
-  ydata = [5, 20, 36, 10, 10, 20]
-  updateChart()
-
-}
-
 function clearData() {
   xdata = []
   ydata = []
@@ -241,45 +283,44 @@ function updateChart() {
   })
 }
 
-function search() {
-  console.log(searchForm)
+async function search() {
+  console.log('category:',searchForm.type, 'time:',searchForm.time)
   clearData()
-  simulateData()
+
+  await axios.get('http://localhost:8080/news/getCategoryClickChange', {
+    params: {
+      category: searchForm.type,
+      startTime: formatDateTime(searchForm.time[0]),
+      endTime: formatDateTime(searchForm.time[1])
+    }
+  })
+  .then(res => {
+    if (res.status == 200) {
+      const data = res.data
+      data.forEach(ele => {
+        xdata.push(ele.date)
+        ydata.push(ele.clickNum)
+      })
+    }
+  })
+  .catch(err => {
+    console.log(err)
+  })
+  console.log(xdata,ydata)
   updateChart()
 }
 
-function simulateData() {
-  const data = [
-    {
-        "date": "2019-06-17",
-        "clickNum": "23845"
-    },
-    {
-        "date": "2019-06-16",
-        "clickNum": "14342"
-    },
-    {
-        "date": "2019-06-13",
-        "clickNum": "14986"
-    },
-    {
-        "date": "2019-06-14",
-        "clickNum": "104586"
-    },
-    {
-        "date": "2019-06-15",
-        "clickNum": "35547"
-    }
-  ]
+function formatDateTime(date: Date) {
+  // 转换为 yyyy-mm-dd hh:mm:ss
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0'); // 月份从0开始，所以需要+1
+  const day = date.getDate().toString().padStart(2, '0');
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const seconds = date.getSeconds().toString().padStart(2, '0');
 
-  data.forEach(ele => {
-    xdata.push(ele.date)
-    ydata.push(ele.clickNum)
-  })
-
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
-
-
 
 </script>
 
