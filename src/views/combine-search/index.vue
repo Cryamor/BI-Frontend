@@ -43,7 +43,7 @@
             style="margin-bottom: 10px;"
           />
         </el-form-item>
-        <el-form-item label="内容长度" prop="contentLen">
+        <!-- <el-form-item label="内容长度" prop="contentLen">
           <el-input-number
             v-model="searchForm.contentLen[0]" 
             :min="0"
@@ -55,7 +55,7 @@
             :max="9999999"
             controls-position="right"
           />
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="用户" prop="user">
           <el-input v-model="searchForm.user" clearable placeholder="请输入用户ID"> </el-input>
         </el-form-item>
@@ -68,12 +68,11 @@
 
     <el-card shadow="never">
       <el-table :data="tableData" style="width: 100%">
-      <el-table-column label="ID" prop="id" width="200"/>
+      <el-table-column label="ID" prop="id" width="150"/>
       <el-table-column label="标题" prop="title" width="200"/>
-      <el-table-column label="发布时间" prop="time" width="200"/>
       <el-table-column label="种类" prop="category" width="150"/>
       <el-table-column label="主题" prop="topic" width="150"/>
-      <el-table-column label="内容" prop="content"/>
+      <el-table-column label="内容" prop="content" :show-overflow-tooltip="true"/>
 
       </el-table>
       <div class="pagination-block">

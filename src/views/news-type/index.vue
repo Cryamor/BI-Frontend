@@ -65,7 +65,8 @@ defineOptions({
 
 let Chart = null
 let xdata = []
-let ydata = []
+let clickydata = []
+let browseydata = []
 
 interface SearchForm {
   type: string
@@ -233,20 +234,32 @@ function init() {
       left: 'center'
     },
     tooltip: {},
+    legend: {
+      right: '20',
+      data: ['点击量', '浏览时间']
+    },
     xAxis: {
       name: '时间',
       boundaryGap: false,
       data: ["def"],
     },
-    yAxis: {
-      name: '日流量'
-    },
+    yAxis: [
+      {
+        name: '点击量',
+        position: 'left'
+      },
+      {
+        name: '浏览时间',
+        position: 'right'
+      }
+    ],
     series: [
       {
-        name: "日流量",
+        name: "点击量",
         type: "line",
         smooth: true,
-        data: [1],
+        data: clickydata,
+        yAxisIndex: 0,
         // itemStyle: {
         //     color: function (params) {
         //         var colorList = ['#FF3030', '#7CFC00', '#409EFF', '#bda29a', '#6e7074', '#546570',];
@@ -254,6 +267,13 @@ function init() {
         //     }
         // }
       },
+      {
+        name: "浏览时间",
+        type: "line",
+        smooth: true,
+        data: browseydata,
+        yAxisIndex: 1,
+      }
     ],
   };
 
@@ -264,7 +284,7 @@ function init() {
 
 function clearData() {
   xdata = []
-  ydata = []
+  clickydata = []
 }
 
 function updateChart() {
@@ -277,8 +297,12 @@ function updateChart() {
     },
     series: [
       {
-        name: "日流量",
-        data: ydata
+        name: "点击量",
+        data: clickydata
+      },
+      {
+        name: "浏览时间",
+        data: browseydata,
       }
     ]
   })
@@ -300,14 +324,15 @@ async function search() {
       const data = res.data
       data.forEach(ele => {
         xdata.push(ele.date)
-        ydata.push(ele.clickNum)
+        clickydata.push(ele.clickNum)
       })
     }
   })
   .catch(err => {
     console.log(err)
   })
-  console.log(xdata,ydata)
+
+  browseydata = [3141387,2132831,2131231,56466437,4745778]
   updateChart()
 }
 

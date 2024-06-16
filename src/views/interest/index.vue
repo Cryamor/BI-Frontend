@@ -54,8 +54,16 @@ defineOptions({
 
 let Chart = null
 let xdata = []
-let ydata = []
-let lastydata = []
+let ydata1 = []
+let ydata2 = []
+let lastxdata = []
+let lastydata1 = []
+let lastydata2 = []
+let showxdata = []
+let showydata1 = []
+let showydata2 = []
+let showlastydata1 = []
+let showlastydata2 = []
 
 interface SearchForm {
   id: string
@@ -65,8 +73,8 @@ interface SearchForm {
 const formSize = ref<ComponentSize>('default')
 
 const searchForm = reactive<SearchForm>({
-  id: '111',
-  time: [new Date(2009,0,31), new Date()],
+  id: '',
+  time: [],
 })
 
 let lastSearchForm = JSON.parse(JSON.stringify(searchForm))
@@ -104,6 +112,10 @@ const shortcuts = [
     },
   },
 ]
+
+const clear = (arr) => {
+  arr.splice(0, arr.length)
+}
 
 const rules = reactive<FormRules<SearchForm>>({
   id: [
@@ -152,27 +164,52 @@ function init() {
       subtext: '上次所选范围: 无',
     },
     tooltip: {},
+    grid: {
+      top: '20%'
+    },
     legend: {
-      right: '20',
-      data: ['所选范围浏览量', '上次所选范围浏览量']
+      right: '0',
+      width: '300',
+      data: ['所选范围浏览量', '上次所选范围浏览量','所选范围浏览时间','上次所选范围浏览时间']
     },
     xAxis: {
       name: '主题',
-      data: xdata
+      data: []
     },
-    yAxis: {
-      name: '浏览量'
-    },
+    yAxis: [
+      {
+        name: '浏览量',
+        position: 'left'
+      },
+      {
+        name: '浏览时间',
+        position: 'right'
+      }
+    ],
     series: [
       {
         name: '所选范围浏览量',
         type: 'bar',
-        data: ydata
+        data: [],
+        yAxisIndex: 0,
       },
       {
         name: '上次所选范围浏览量',
         type: 'bar',
-        data: lastydata
+        data: [],
+        yAxisIndex: 0,
+      },
+      {
+        name: '所选范围浏览时间',
+        type: 'bar',
+        data: [],
+        yAxisIndex: 1,
+      },
+      {
+        name: '上次所选范围浏览时间',
+        type: 'bar',
+        data: [],
+        yAxisIndex: 1,
       }
     ]
     
@@ -183,9 +220,14 @@ function init() {
 
 async function search() {
   console.log('user id:', searchForm.id, 'time:', searchForm.time)
-  Object.assign(lastydata, ydata)
+  clear(lastxdata)
+  clear(lastydata1)
+  clear(lastydata2)
+  Object.assign(lastydata1, ydata1)
+  Object.assign(lastydata2, ydata2)
+  Object.assign(lastxdata, xdata)
 
-  await axios.get('http://localhost:8080/news/getUserTopic', {
+  await axios.get('http://localhost:8080/news/ust', {
     params: {
       userId: searchForm.id,
       startTime: formatDateTime(searchForm.time[0]),
@@ -195,24 +237,59 @@ async function search() {
   .then(res => {
     console.log(res)
     if (res.status == 200) {
+      const data = res.data
+      clear(xdata)
+      clear(ydata1)
+      clear(ydata2)
+      data.forEach(ele => {
+        xdata.push(ele.topic)
+        ydata1.push(ele.clickNum)
+      })
 
+      const m = mergeArrays(lastxdata, lastydata1, xdata, ydata1)
+      showxdata = m[0]
+      showydata1 = m[1]
+      showlastydata1 = m[2]
+
+      const n = mergeArrays(lastxdata, lastydata2, xdata, ydata2)
+      showydata2 = n[1]
+      showlastydata2 = n[2]
+
+      console.log(m,n)
     }
   })
   .catch(err => {
     console.log(err)
   })
 
-  ydata = [11,45,14,191,98,10,233,33]
-
   Chart.setOption({
+    xAxis: {
+      name: '主题',
+      data: showxdata,
+      axisLabel: {
+        interval: 0,
+        rotate: 45,
+        fontSize: 8,
+        overflow: 'breakAll',
+        width: 60
+      }
+    },
     series: [
       {
         name: '所选范围浏览量',
-        data: ydata
+        data: showydata1
       },
       {
         name: '上次所选范围浏览量',
-        data: lastydata
+        data: showlastydata1
+      },
+      {
+        name: '所选范围浏览时间',
+        data: showydata2
+      },
+      {
+        name: '上次所选范围浏览时间',
+        data: showlastydata2
       }
     ],
   })
@@ -232,9 +309,24 @@ async function search() {
 
 }
 
-function arrange() {
-  
+function mergeArrays(xdata: string[], ydata: number[], x: string[], y: number[]): [string[], number[], number[]] {
+  // 合并xdata数组，得到所有唯一的x值
+  const newXdata = Array.from(new Set([...xdata, ...x]));
+  // 初始化新的ydata数组，初始值为0
+  const newYdata = new Array(newXdata.length).fill(0);
+  // 根据新的x和y数据更新newYdata数组
+  for (let i = 0; i < x.length; i++) {
+    const index = newXdata.indexOf(x[i]);
+    if (index !== -1) {
+      newYdata[index] = y[i];
+    }
+  }
+  // 创建last数组，原始ydata值保持不变，新加入的x值对应的y值为0
+  const last = ydata.concat(new Array(newXdata.length - xdata.length).fill(0));
+
+  return [newXdata, newYdata, last];
 }
+
 
 </script>
 
