@@ -285,6 +285,7 @@ function init() {
 function clearData() {
   xdata = []
   clickydata = []
+  browseydata = []
 }
 
 function updateChart() {
@@ -312,7 +313,7 @@ async function search() {
   console.log('category:',searchForm.type, 'time:',searchForm.time)
   clearData()
 
-  await axios.get('http://localhost:8080/news/getCategoryClickChange', {
+  await axios.get('http://localhost:8080/news/getCategoryClickChangeTimes', {
     params: {
       category: searchForm.type,
       startTime: formatDateTime(searchForm.time[0]),
@@ -332,7 +333,27 @@ async function search() {
     console.log(err)
   })
 
-  browseydata = [3141387,2132831,2131231,56466437,4745778]
+  await axios.get('http://localhost:8080/news/getCategoryClickChangeDuration', {
+    params: {
+      category: searchForm.type,
+      startTime: formatDateTime(searchForm.time[0]),
+      endTime: formatDateTime(searchForm.time[1])
+    }
+  })
+  .then(res => {
+    console.log(res)
+    if (res.status == 200) {
+      const data = res.data
+      data.forEach(ele => {
+        // xdata.push(ele.date)
+        browseydata.push(ele.browseTime)
+      })
+    }
+  })
+  .catch(err => {
+    console.log(err)
+  })
+
   updateChart()
 }
 
