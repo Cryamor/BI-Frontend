@@ -96,7 +96,7 @@
 
 import { ref, reactive, onMounted, CSSProperties } from 'vue'
 import type { ComponentSize, FormInstance, FormRules } from 'element-plus'
-import { formatDateTime } from '@/api/format/format-time'
+import { formatDateTime, shortcuts, options } from '@/api/format/format-time'
 import axios from 'axios';
 
 defineOptions({
@@ -147,113 +147,6 @@ const searchFormRef = ref<FormInstance>()
 
 const rules = reactive<FormRules<SearchForm>>({
 })
-
-const options = [
-  {
-    value: 'sports',
-    label: 'sports',
-  },
-  {
-    value: 'news',
-    label: 'news',
-  },
-  {
-    value: 'autos',
-    label: 'autos',
-  },
-  {
-    value: 'foodanddrink',
-    label: 'foodanddrink',
-  },
-  {
-    value: 'finance',
-    label: 'finance',
-  },
-  {
-    value: 'music',
-    label: 'music',
-  },
-  {
-    value: 'lifestyle',
-    label: 'lifestyle',
-  },
-  {
-    value: 'weather',
-    label: 'weather',
-  },
-  {
-    value: 'health',
-    label: 'health',
-  },
-  {
-    value: 'video',
-    label: 'video',
-  },
-  {
-    value: 'movies',
-    label: 'movies',
-  },
-  {
-    value: 'tv',
-    label: 'tv',
-  },
-  {
-    value: 'travel',
-    label: 'travel',
-  },
-  {
-    value: 'entertainment',
-    label: 'entertainment',
-  },
-  {
-    value: 'kids',
-    label: 'kids',
-  },
-  {
-    value: 'europe',
-    label: 'europe',
-  },
-  {
-    value: 'northamerica',
-    label: 'northamerica',
-  },
-  {
-    value: 'adexperience',
-    label: 'adexperience',
-  },
-]
-
-const shortcuts = [
-  {
-    text: '2010~2030',
-    value: () => {
-      const start = new Date(2010,2,14)
-      const end = new Date(2030,2,14)
-      return [start, end]
-    }
-  },
-  {
-    text: 'This month',
-    value: [new Date(), new Date()],
-  },
-  {
-    text: 'This year',
-    value: () => {
-      const end = new Date()
-      const start = new Date(new Date().getFullYear(), 0)
-      return [start, end]
-    },
-  },
-  {
-    text: 'Last 6 months',
-    value: () => {
-      const end = new Date()
-      const start = new Date()
-      start.setMonth(start.getMonth() - 6)
-      return [start, end]
-    },
-  },
-]
 
 interface Mark {
   style: CSSProperties
