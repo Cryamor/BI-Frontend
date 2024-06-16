@@ -15,7 +15,7 @@
         <el-form-item label="新闻主题" prop="category">
           <el-select v-model="searchForm.category" placeholder="选择要查询的新闻主题">
             <el-option
-              v-for="item in options"
+              v-for="item in optionsWithAll"
               :key="item.value"
               :label="item.label"
               :value="item.value"
@@ -96,7 +96,7 @@
 
 import { ref, reactive, onMounted, CSSProperties } from 'vue'
 import type { ComponentSize, FormInstance, FormRules } from 'element-plus'
-import { formatDateTime, shortcuts, options } from '@/api/format/format-time'
+import { formatDateTime, shortcuts, optionsWithAll } from '@/api/format/format-time'
 import axios from 'axios';
 
 defineOptions({
@@ -197,7 +197,7 @@ async function search() {
   console.log('search:', searchForm, 'page:', curPage.value)
   await axios.get('http://localhost:8080/news/getNewsByMultipleConditions', {
     params: {
-      category: searchForm.category,
+      category: searchForm.category == 'All' ? '' : searchForm.category,
       startTime: formatDateTime(searchForm.time[0]),
       endTime: formatDateTime(searchForm.time[1]),
       minLen: searchForm.titleLen[0],

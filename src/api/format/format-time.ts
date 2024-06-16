@@ -20,26 +20,26 @@ export const shortcuts = [
     }
   },
   {
-    text: '6.14~6.18',
+    text: '6.13~6.19',
     value: () => {
-      const start = new Date(2019,5,14)
-      const end = new Date(2019,5,18)
+      const start = new Date(2019,5,13)
+      const end = new Date(2019,5,19)
       return [start, end]
     }
   },
   {
-    text: '6.14~6.16',
+    text: '6.13~6.16',
     value: () => {
-      const start = new Date(2019,5,14)
+      const start = new Date(2019,5,13)
       const end = new Date(2019,5,16)
       return [start, end]
     }
   },
   {
-    text: '6.16~6.18',
+    text: '6.16~6.19',
     value: () => {
       const start = new Date(2019,5,16)
-      const end = new Date(2019,5,18)
+      const end = new Date(2019,5,19)
       return [start, end]
     }
   },
@@ -67,6 +67,85 @@ export const shortcuts = [
 ]
 
 export const options = [
+  {
+    value: 'sports',
+    label: 'sports',
+  },
+  {
+    value: 'news',
+    label: 'news',
+  },
+  {
+    value: 'autos',
+    label: 'autos',
+  },
+  {
+    value: 'foodanddrink',
+    label: 'foodanddrink',
+  },
+  {
+    value: 'finance',
+    label: 'finance',
+  },
+  {
+    value: 'music',
+    label: 'music',
+  },
+  {
+    value: 'lifestyle',
+    label: 'lifestyle',
+  },
+  {
+    value: 'weather',
+    label: 'weather',
+  },
+  {
+    value: 'health',
+    label: 'health',
+  },
+  {
+    value: 'video',
+    label: 'video',
+  },
+  {
+    value: 'movies',
+    label: 'movies',
+  },
+  {
+    value: 'tv',
+    label: 'tv',
+  },
+  {
+    value: 'travel',
+    label: 'travel',
+  },
+  {
+    value: 'entertainment',
+    label: 'entertainment',
+  },
+  {
+    value: 'kids',
+    label: 'kids',
+  },
+  {
+    value: 'europe',
+    label: 'europe',
+  },
+  {
+    value: 'northamerica',
+    label: 'northamerica',
+  },
+  {
+    value: 'adexperience',
+    label: 'adexperience',
+  },
+]
+
+export const optionsWithAll = [
+  {
+    value: 'All',
+    label: 'All',
+  },
   {
     value: 'sports',
     label: 'sports',
