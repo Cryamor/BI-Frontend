@@ -64,6 +64,7 @@ import * as echarts from "echarts";
 import { onMounted, ref, reactive } from "vue";
 import type { ComponentSize, FormInstance, FormRules } from 'element-plus'
 import axios from "axios";
+import { formatDateTime } from '@/api/format/format-time'
 
 
 defineOptions({
@@ -72,7 +73,8 @@ defineOptions({
 
 let Chart = null
 let xdata = []
-let ydata = []
+let clickydata = []
+let browseydata = []
 
 const newsSelected = ref({
   title: '',
@@ -166,6 +168,10 @@ const resetForm = (formEl: FormInstance | undefined) => {
   formEl.resetFields()
 }
 
+const clear = (arr) => {
+  arr.splice(0, arr.length)
+}
+
 function init() {
   Chart = echarts.init(document.getElementById("ct1"))
   let options = {
@@ -174,27 +180,40 @@ function init() {
       left: 'center'
     },
     tooltip: {},
+    legend: {
+      right: '20',
+      data: ['点击量', '浏览时间']
+    },
     xAxis: {
       name: '时间',
       boundaryGap: false,
-      data: ["def"],
+      data: [],
     },
-    yAxis: {
-      name: '点击量'
-    },
+    yAxis: [
+      {
+        name: '点击量',
+        position: 'left'
+      },
+      {
+        name: '浏览时间',
+        position: 'right'
+      }
+    ],
     series: [
       {
         name: "点击量",
         type: "line",
         smooth: true,
-        data: [],
-        // itemStyle: {
-        //     color: function (params) {
-        //         var colorList = ['#FF3030', '#7CFC00', '#409EFF', '#bda29a', '#6e7074', '#546570',];
-        //         return colorList[params.dataIndex]
-        //     }
-        // }
+        data: clickydata,
+        yAxisIndex: 0,
       },
+      {
+        name: "浏览时间",
+        type: "line",
+        smooth: true,
+        data: browseydata,
+        yAxisIndex: 1,
+      }
     ],
   }
 
@@ -205,7 +224,8 @@ function init() {
 
 function clearData() {
   xdata = []
-  ydata = []
+  clickydata = []
+  browseydata = []
 }
 
 function updateChart() {
@@ -216,7 +236,11 @@ function updateChart() {
     series: [
       {
         name: "点击量",
-        data: ydata
+        data: clickydata
+      },
+      {
+        name: "浏览时间",
+        data: browseydata
       }
     ]
   })
@@ -224,7 +248,7 @@ function updateChart() {
 
 async function search() {
   console.log(`news id: ${searchForm.id} time:`, searchForm.time)
-  await axios.get('http://localhost:8080/news/getNewsLifeCircle', {
+  await axios.get('http://localhost:8080/news/getNewsLifeCircleTimes', {
     params: {
       newsId: searchForm.id,
       startTime: formatDateTime(searchForm.time[0]),
@@ -235,10 +259,33 @@ async function search() {
     if (res.status == 200) {
       console.log(res)
       const dataArr = res.data
-      clearData()
+      clear(xdata)
+      clear(clickydata)
       dataArr.forEach(ele => {
         xdata.push(ele.date)
-        ydata.push(ele.clickNum)
+        clickydata.push(ele.clickNum)
+      })
+    }
+  })
+  .catch(err => {
+    console.log(err)
+  })
+
+  await axios.get('http://localhost:8080/news/getNewsLifeCircleDuration', {
+    params: {
+      newsId: searchForm.id,
+      startTime: formatDateTime(searchForm.time[0]),
+      endTime: formatDateTime(searchForm.time[1]),
+    }
+  })
+  .then(res => {
+    if (res.status == 200) {
+      console.log(res)
+      const dataArr = res.data
+      clear(browseydata)
+      dataArr.forEach(ele => {
+        // xdata.push(ele.date)
+        browseydata.push(ele.browseTime)
       })
     }
   })
@@ -269,18 +316,6 @@ async function search() {
   showNewsDetail.value = true
 }
 
-function formatDateTime(date: Date) {
-  // 转换为 yyyy-mm-dd hh:mm:ss
-  const year = date.getFullYear();
-  const month = (date.getMonth() + 1).toString().padStart(2, '0'); // 月份从0开始，所以需要+1
-  const day = date.getDate().toString().padStart(2, '0');
-  const hours = date.getHours().toString().padStart(2, '0');
-  const minutes = date.getMinutes().toString().padStart(2, '0');
-  const seconds = date.getSeconds().toString().padStart(2, '0');
-
-  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-}
-
 function simulateData() {
   // 模拟数据
   const data = [
@@ -300,7 +335,7 @@ function simulateData() {
 
   data.forEach(ele => {
     xdata.push(ele.date)
-    ydata.push(ele.clickNum)
+    // ydata.push(ele.clickNum)
   })
 
   newsSelected.value = {

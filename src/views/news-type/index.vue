@@ -222,6 +222,10 @@ const resetForm = (formEl: FormInstance | undefined) => {
   formEl.resetFields()
 }
 
+const clear = (arr) => {
+  arr.splice(0, arr.length)
+}
+
 onMounted(() => {
   init()
 });
@@ -241,7 +245,7 @@ function init() {
     xAxis: {
       name: '时间',
       boundaryGap: false,
-      data: ["def"],
+      data: [],
     },
     yAxis: [
       {
@@ -260,12 +264,6 @@ function init() {
         smooth: true,
         data: clickydata,
         yAxisIndex: 0,
-        // itemStyle: {
-        //     color: function (params) {
-        //         var colorList = ['#FF3030', '#7CFC00', '#409EFF', '#bda29a', '#6e7074', '#546570',];
-        //         return colorList[params.dataIndex]
-        //     }
-        // }
       },
       {
         name: "浏览时间",
