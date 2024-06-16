@@ -79,7 +79,7 @@
     </el-card>
 
     <el-card shadow="never">
-      <el-table :data="tableData" style="width: 100%">
+      <el-table :data="tableData" style="width: 100%" @row-click="showDetail">
       <el-table-column label="ID" prop="id" width="150"/>
       <el-table-column label="标题" prop="title" width="300"/>
       <el-table-column label="类别" prop="category" width="150"/>
@@ -91,6 +91,14 @@
         <el-button :disabled="!hasSearched" type="primary" @click="nextPage">下一页</el-button>
       </div>
     </el-card>
+
+    <el-dialog v-model="showNewsDetail" width="85%">
+      <div class="content-container">
+        <h2> {{newsSelected.title}} </h2>
+        <div class="news-time">类别: {{newsSelected.category}}&nbsp&nbsp&nbsp&nbsp 主题: {{newsSelected.topic}} </div>
+        <div class="news-content">{{newsSelected.content}} </div>
+      </div>
+    </el-dialog>
 
   </div>
 </template>
@@ -257,6 +265,15 @@ const lastPage = () => {
   search()
 }
 
+function showDetail(row, event, column) {
+  newsSelected.value.title = row.title
+  newsSelected.value.content = row.content
+  newsSelected.value.id = row.id
+  newsSelected.value.topic = row.topic
+  newsSelected.value.category = row.category
+  showNewsDetail.value = true
+}
+
 function search() {
   hasSearched.value = true
   switch(radio.value) {
@@ -285,12 +302,6 @@ function searchById() {
   .then(res => {
     if (res.status == 200) {
       clearTable()
-      newsSelected.value.title = res.data.headline
-      newsSelected.value.content = res.data.content
-      newsSelected.value.id = res.data.news_id
-      newsSelected.value.topic = res.data.topic
-      newsSelected.value.category = res.data.category
-
       let ele = {
         id: res.data.news_id,
         title: res.data.headline,
@@ -378,6 +389,18 @@ function searchByCategory() {
   :deep(.el-card__body) {
     padding-bottom: 2px;
   }
+}
+
+.news-time {
+  color: #999;
+  font-size: small;
+  margin-bottom: 20px;
+}
+
+.news-content {
+  padding-right: 30px;
+  font-size: medium;
+  overflow-wrap: break-word;
 }
 
 </style>

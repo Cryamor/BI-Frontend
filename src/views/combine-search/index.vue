@@ -67,7 +67,7 @@
     </el-card>
 
     <el-card shadow="never">
-      <el-table :data="tableData" style="width: 100%">
+      <el-table :data="tableData" style="width: 100%" @row-click="showDetail">
       <el-table-column label="ID" prop="id" width="150"/>
       <el-table-column label="标题" prop="title" width="200"/>
       <el-table-column label="种类" prop="category" width="150"/>
@@ -80,6 +80,14 @@
         <el-button :disabled="!hasSearched" type="primary" @click="nextPage">下一页</el-button>
       </div>
     </el-card>
+
+    <el-dialog v-model="showNewsDetail" width="85%">
+      <div class="content-container">
+        <h2> {{newsSelected.title}} </h2>
+        <div class="news-time">类别: {{newsSelected.category}}&nbsp&nbsp&nbsp&nbsp 主题: {{newsSelected.topic}} </div>
+        <div class="news-content">{{newsSelected.content}} </div>
+      </div>
+    </el-dialog>
 
   </div>
 </template>
@@ -99,8 +107,10 @@ const tableData = reactive([])
 const showNewsDetail = ref(false)
 const newsSelected = ref({
   title: '',
-  time: '',
-  content: ''
+  content: '',
+  category: '',
+  topic: '',
+  id: '',
 })
 
 const curPage = ref(1)
@@ -326,6 +336,14 @@ async function search() {
   })
 }
 
+function showDetail(row, event, column) {
+  newsSelected.value.title = row.title
+  newsSelected.value.content = row.content
+  newsSelected.value.id = row.id
+  newsSelected.value.topic = row.topic
+  newsSelected.value.category = row.category
+  showNewsDetail.value = true
+}
 
 </script>
 
