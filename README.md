@@ -1,7 +1,7 @@
 
 ## ⚡ Introduction
 
-Based on Vue3, Element Plus, Apache Echarts and [V3 Admin Vite](https://github.com/un-pany/v3-admin-vite)
+Based on [Vue3](https://vuejs.org/), [Element Plus](https://element-plus.org/), [Apache Echarts](https://echarts.apache.org/) and [V3 Admin Vite](https://github.com/un-pany/v3-admin-vite)
 
 Views:
 ### 1 新闻查询
@@ -46,3 +46,7 @@ Views:
 ### 6 新闻推荐
 
 ![](assets/image-14.png)
+
+### 7 其他
+
+对所有页面做了缓存，回到之前页面时保留当时的搜索条件和结果
