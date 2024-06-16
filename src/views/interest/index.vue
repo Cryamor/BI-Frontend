@@ -170,7 +170,7 @@ function init() {
     legend: {
       right: '0',
       width: '300',
-      data: ['所选范围浏览量', '上次所选范围浏览量','所选范围浏览时间','上次所选范围浏览时间']
+      data: ['本次所选范围浏览量','本次所选范围浏览时间', '上次所选范围浏览量','上次所选范围浏览时间']
     },
     xAxis: {
       name: '主题',
@@ -188,28 +188,50 @@ function init() {
     ],
     series: [
       {
-        name: '所选范围浏览量',
+        name: '本次所选范围浏览量',
         type: 'bar',
         data: [],
         yAxisIndex: 0,
+        itemStyle: {
+          normal: {
+            color: '#0366fc'
+          }
+        }
       },
       {
         name: '上次所选范围浏览量',
         type: 'bar',
         data: [],
         yAxisIndex: 0,
+        itemStyle: {
+          normal: {
+            opacity: 0.5,
+            color: '#91aad9'
+          }
+        }
       },
       {
-        name: '所选范围浏览时间',
+        name: '本次所选范围浏览时间',
         type: 'bar',
         data: [],
         yAxisIndex: 1,
+        itemStyle: {
+          normal: {
+            color: '#03a82f'
+          }
+        }
       },
       {
         name: '上次所选范围浏览时间',
         type: 'bar',
         data: [],
         yAxisIndex: 1,
+        itemStyle: {
+          normal: {
+            opacity: 0.5,
+            color: '#95ba9f'
+          }
+        }
       }
     ]
     
@@ -227,7 +249,7 @@ async function search() {
   Object.assign(lastydata2, ydata2)
   Object.assign(lastxdata, xdata)
 
-  await axios.get('http://localhost:8080/news/ust', {
+  await axios.get('http://localhost:8080/news/getUserTopicTimes', {
     params: {
       userId: searchForm.id,
       startTime: formatDateTime(searchForm.time[0]),
@@ -240,7 +262,6 @@ async function search() {
       const data = res.data
       clear(xdata)
       clear(ydata1)
-      clear(ydata2)
       data.forEach(ele => {
         xdata.push(ele.topic)
         ydata1.push(ele.clickNum)
@@ -251,11 +272,35 @@ async function search() {
       showydata1 = m[1]
       showlastydata1 = m[2]
 
+      console.log(m)
+    }
+  })
+  .catch(err => {
+    console.log(err)
+  })
+
+  await axios.get('http://localhost:8080/news/getUserTopicDuration', {
+    params: {
+      userId: searchForm.id,
+      startTime: formatDateTime(searchForm.time[0]),
+      endTime: formatDateTime(searchForm.time[1])
+    }
+  })
+  .then(res => {
+    console.log(res)
+    if (res.status == 200) {
+      const data = res.data
+      clear(ydata2)
+      data.forEach(ele => {
+        // xdata.push(ele.topic)
+        ydata2.push(ele.browseTime)
+      })
+
       const n = mergeArrays(lastxdata, lastydata2, xdata, ydata2)
       showydata2 = n[1]
       showlastydata2 = n[2]
 
-      console.log(m,n)
+      console.log(n)
     }
   })
   .catch(err => {
@@ -276,7 +321,7 @@ async function search() {
     },
     series: [
       {
-        name: '所选范围浏览量',
+        name: '本次所选范围浏览量',
         data: showydata1
       },
       {
@@ -284,7 +329,7 @@ async function search() {
         data: showlastydata1
       },
       {
-        name: '所选范围浏览时间',
+        name: '本次所选范围浏览时间',
         data: showydata2
       },
       {
@@ -300,7 +345,7 @@ async function search() {
   if (lastid != null && lastid != '') {
     Chart.setOption({
       title: {
-        subtext: `上次所选范围: [用户ID: ${lastid}, 时间范围: ${lasttime[0].toLocaleDateString()} ~ ${lasttime[1].toLocaleDateString()}]`
+        subtext: `上次所选范围: [ID: ${lastid}, 时间: ${lasttime[0].toLocaleDateString()} ~ ${lasttime[1].toLocaleDateString()}]`
       }
     })
   }

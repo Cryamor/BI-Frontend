@@ -180,14 +180,14 @@ function init() {
       data: ["def"],
     },
     yAxis: {
-      name: '日流量'
+      name: '点击量'
     },
     series: [
       {
-        name: "日流量",
+        name: "点击量",
         type: "line",
         smooth: true,
-        data: [1],
+        data: [],
         // itemStyle: {
         //     color: function (params) {
         //         var colorList = ['#FF3030', '#7CFC00', '#409EFF', '#bda29a', '#6e7074', '#546570',];
@@ -215,7 +215,7 @@ function updateChart() {
     },
     series: [
       {
-        name: "日流量",
+        name: "点击量",
         data: ydata
       }
     ]

@@ -111,6 +111,9 @@ const search = () => {
 </script>
 
 <style scoped>
+.search-wrapper {
+  margin: 20px 0;
+}
 
 .content-wrapper {
   margin: 20px 0;
